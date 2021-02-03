@@ -1,4 +1,4 @@
-﻿#define _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
 
 #include <algorithm>
 #include <cmath>
@@ -37,6 +37,7 @@ struct data
 {
     ELEMENT_TYPE element_type;  /*тип элемента (ELEMENT_TYPE для упрощения восприятия)*/
     double value;               /*значение текстового поля, если оно число*/
+    std::string str_value;      /*текстовое значение числа (для удобства в поиске ошибок)*/
 };
 
 void help()
@@ -55,7 +56,7 @@ void help()
 }
 
 /*поиск позиции первого положения оператора*/
-int find_position_first_operations(std::string input, ELEMENT_TYPE& operation_type, double& value, int& operation_length, std::vector<data> field)
+int find_position_first_operations(std::string input, std::string& str_value, ELEMENT_TYPE& operation_type, double& value, int& operation_length, std::vector<data> field)
 {
     int position = std::string::npos; /*номер искомой позиции (изначально это максимальное положительное число) */
     operation_length = 0;             /*кол-во символов в операторе*/
@@ -97,6 +98,13 @@ int find_position_first_operations(std::string input, ELEMENT_TYPE& operation_ty
         value = M_PI;
     }
 
+    if (input.find("exp(") < position) /*функция экспонента*/
+    {
+        position = input.find("exp(");
+        operation_type = ET_EXP;
+        operation_length = 4;
+    }
+
     if (input.find("e") < position) /*константа епсилон*/
     {
         position = input.find("e");
@@ -110,13 +118,6 @@ int find_position_first_operations(std::string input, ELEMENT_TYPE& operation_ty
         position = input.find("^");
         operation_type = ET_POW;  
         operation_length = 1;
-    }
-
-    if (input.find("exp(") < position) /*функция экспонента*/
-    {
-        position = input.find("exp(");
-        operation_type = ET_EXP;
-        operation_length = 4;
     }
 
     if (input.find("sqrt(") < position) /*функция квадратный корень*/
@@ -177,17 +178,17 @@ int find_position_first_operations(std::string input, ELEMENT_TYPE& operation_ty
 
     if ((position > 0) && (input.size() > 0)) /*считывание числа*/
     {
-        std::string str = input.substr(0, position);
-        value = std::stod(str);
-        operation_length = str.size();
+        str_value = input.substr(0, position);
+        value = std::stod(str_value);
+        operation_length = str_value.size();
         operation_type = ET_VALUE;
     }
 
     if ((position == -1) && (input.size() > 0)) /*считывание последнего числа в варажении*/
     {
-        std::string str = input.substr(0, input.size());
-        value = std::stod(str);
-        operation_length = str.size();
+        str_value = input.substr(0, input.size());
+        value = std::stod(str_value);
+        operation_length = str_value.size();
         operation_type = ET_VALUE;
         position = input.size();
     }
@@ -226,14 +227,16 @@ int input_to_vector_data(std::string input, std::vector<data>& elements)
     data elemet;                    /*структура нового элемента*/
     int operation_length = 0;       /*возвращаемое значение длины элемента в символах*/
     double value = 0;               /*возвращаемое значение*/
+    std::string string_value;
     ELEMENT_TYPE operation_type;    /*возвращаемое значение типа элемента*/
 
     /*пока не найдем std::string::npos*/
-    while ((find_position_first_operations(input, operation_type, value, operation_length, elements) != std::string::npos))
+    while ((find_position_first_operations(input, string_value, operation_type, value, operation_length, elements) != std::string::npos))
     {
         if (operation_type == ET_VALUE) /*проверка, что найденый символ - число*/
         {
             elemet.element_type = ET_VALUE;
+            elemet.str_value = string_value;
             elemet.value = value;
         }
         else /*обработка всех остальных операторов*/
@@ -270,12 +273,26 @@ bool find_brackets(std::vector<data>& field,
             break;
         }
 
-    for (int i = pos_open_bracket; i < field.size(); i++) /*ищем закрывающуюся скобку относительно открывающейся*/
-        if (field[i].element_type == ET_BRACKET_RIGHT)
-        {
-            pos_close_bracket = i;
-            break;
-        }
+    if (pos_open_bracket == -1)       /*если не нашлась открывающаяся скобка, смотрим, есть ли закрывающиеся*/
+    {
+        for (int i = 0; i < field.size(); i++) /*ищем закрывающуюся скобку относительно открывающейся*/
+            if (field[i].element_type == ET_BRACKET_RIGHT)
+            {
+                pos_close_bracket = i;
+                break;
+            }
+    }
+    else         /*иначе ищем закрывающуюся скобку относительно открывающейся*/
+    {
+
+        for (int i = pos_open_bracket; i < field.size(); i++) 
+            if (field[i].element_type == ET_BRACKET_RIGHT)
+            {
+                pos_close_bracket = i;
+                break;
+            }
+
+    }
 
     if ((pos_open_bracket == -1) && (pos_close_bracket == -1) && field.size() > 1)
     {
@@ -432,9 +449,9 @@ void replace_x(std::vector<data>& field, double x) /*замена перемен
         }
 }
 
-void check_mistake(std::vector<data>& field) /*если перед скобками или какой-то функцией не стоит знак умножить*/
+void check_mistake(std::vector<data>& field) /*если перед скобками, после скобок или какой-то функцией не стоит знак умножить*/
 {
-    for (int i = 0; i < field.size(); i++)
+    for (int i = 0; i < field.size() - 1; i++)      /*после числа на поставлен знак умножить*/
         if ((field[i].element_type == ET_VALUE) &&
             (field[i + 1].element_type == ET_BRACKET_LEFT ||
                 field[i + 1].element_type == ET_COS ||
@@ -448,6 +465,35 @@ void check_mistake(std::vector<data>& field) /*если перед скобка�
             std::cout << "Don't forget to write '*' before function or brackets!";
             exit(0);
         }
+    
+    for (int i = 0; i < field.size() - 1; i++)      /*после закрывающейся скобки не стоит знак умножить*/
+        if (field[i].element_type == ET_BRACKET_RIGHT &&
+            (field[i + 1].element_type == ET_BRACKET_RIGHT ||
+                field[i + 1].element_type == ET_VALUE ||
+                field[i + 1].element_type == ET_SIN ||
+                field[i + 1].element_type == ET_COS ||
+                field[i + 1].element_type == ET_TAN ||
+                field[i + 1].element_type == ET_COTAN ||
+                field[i + 1].element_type == ET_EXP ||
+                field[i + 1].element_type == ET_SQRT ||
+                field[i + 1].element_type == ET_X))
+        {
+            std::cout << "Don't forget to write '*' before function or brackets or after its!";
+            exit(0);
+        }
+
+    int counter_of_points = 0;
+    for (int i = 0; i < field.size(); i++)
+        if (field[i].element_type == ET_VALUE)
+            for (int j = 0; j < field[i].str_value.size(); j++)
+                if (field[i].str_value[j] == '.')
+                    counter_of_points++;
+
+    if (counter_of_points > 1)
+    {
+        std::cout << "There aren't one point in the value.";
+        exit(0);
+    }
 }
 
 int main()
