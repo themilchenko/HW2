@@ -10,7 +10,7 @@ enum ELEMENT_TYPE /*типы элементов строки*/
 {
     /*группа констант*/
     ET_VALUE,          /*число         */
- 
+
     /*группа операций без скобок*/
     ET_POW,            /*возведение в степень  */
     ET_MULT,           /*умножение    */
@@ -43,16 +43,16 @@ struct data
 void help()
 {
     std::cout << "============================================================================================\n"
-        << "Welcome to the calculator!\n"
-        << "There are functions and operations you may use:\n"
-        << "1. Operations: plus (+), minus (-), division (/), multiplication(*) and unary minus (- 'some digit');\n"
-        << "2. Brackets: open bracket ('(') and close bracket (')');\n"
-        << "3. Trigonometry functions: sinus (sin('some values')), cosinus (cos('something'), tangens (tg('something'),"
-        << " cotangens (cot('something');\n"
-        << "4. Functions: exhibition (exp('something')), square root (sqrt('something')) and power (('something')^('something');\n"
-        << "5. Constants: epsilon (e) and the number pi (pi).\n"
-        << "6. You can enter the variable 'x' in your expression and after this assign value to it.\n"
-        << "============================================================================================\n";
+              << "Welcome to the calculator!\n"
+              << "There are functions and operations you may use:\n"
+              << "1. Operations: plus (+), minus (-), division (/), multiplication(*) and unary minus (- 'some digit');\n"
+              << "2. Brackets: open bracket ('(') and close bracket (')');\n"
+              << "3. Trigonometry functions: sinus (sin('some values')), cosinus (cos('something'), tangens (tg('something'),"
+              << " cotangens (cot('something');\n"
+              << "4. Functions: exhibition (exp('something')), square root (sqrt('something')) and power (('something')^('something');\n"
+              << "5. Constants: epsilon (e) and the number pi (pi).\n"
+              << "6. You can enter the variable 'x' in your expression and after this assign value to it.\n"
+              << "============================================================================================\n";
 }
 
 /*поиск позиции первого положения оператора*/
@@ -64,37 +64,37 @@ int find_position_first_operations(std::string input, std::string& str_value, EL
 
     if (input.find("*") < position)  /*умножение*/
     {
-        position = input.find("*");   
-        operation_type = ET_MULT;     
-        operation_length = 1;         
+        position = input.find("*");
+        operation_type = ET_MULT;
+        operation_length = 1;
     }
 
     if (input.find("/") < position) /*деление*/
     {
         position = input.find("/");
-        operation_type = ET_DIV;   
-        operation_length = 1;      
+        operation_type = ET_DIV;
+        operation_length = 1;
     }
 
     if (input.find("+") < position) /*сложение*/
     {
         position = input.find("+");
-        operation_type = ET_PLUS;  
-        operation_length = 1;    
+        operation_type = ET_PLUS;
+        operation_length = 1;
     }
 
     if (input.find("-") < position) /*вычитание*/
     {
         position = input.find("-");
-        operation_type = ET_MINUS; 
-        operation_length = 1;      
+        operation_type = ET_MINUS;
+        operation_length = 1;
     }
 
     if (input.find("pi") < position) /*константа пи*/
     {
         position = input.find("pi");
-        operation_type = ET_VALUE;   
-        operation_length = 2;      
+        operation_type = ET_VALUE;
+        operation_length = 2;
         value = M_PI;
     }
 
@@ -108,15 +108,15 @@ int find_position_first_operations(std::string input, std::string& str_value, EL
     if (input.find("e") < position) /*константа епсилон*/
     {
         position = input.find("e");
-        operation_type = ET_VALUE;    
-        operation_length = 1;     
+        operation_type = ET_VALUE;
+        operation_length = 1;
         value = M_E;
     }
 
     if (input.find("^") < position) /*деление*/
     {
         position = input.find("^");
-        operation_type = ET_POW;  
+        operation_type = ET_POW;
         operation_length = 1;
     }
 
@@ -207,10 +207,10 @@ void unary(std::vector<data>& field) /*проверка на наличие ун
     {
         if (field[i].element_type == ET_MINUS &&
             (field[i - 1].element_type == ET_PLUS ||
-                field[i - 1].element_type == ET_MINUS ||
-                field[i - 1].element_type == ET_DIV ||
-                field[i - 1].element_type == ET_MULT ||
-                field[i - 1].element_type == ET_BRACKET_LEFT))
+             field[i - 1].element_type == ET_MINUS ||
+             field[i - 1].element_type == ET_DIV ||
+             field[i - 1].element_type == ET_MULT ||
+             field[i - 1].element_type == ET_BRACKET_LEFT))
         {
             if (field[i + 1].element_type == ET_VALUE)
             {
@@ -255,8 +255,8 @@ int input_to_vector_data(std::string input, std::vector<data>& elements)
 
 /*поиск скобок*/
 bool find_brackets(std::vector<data>& field,
-    int& pos_open_bracket,
-    int& pos_close_bracket)/*входной массив элементов выражения*/
+                   int& pos_open_bracket,
+                   int& pos_close_bracket)/*входной массив элементов выражения*/
 {
     pos_close_bracket = -1;/*номер элемента положения правой скобки*/
     pos_open_bracket = -1;/*номер элемента положения левой скобки или операции со скобкой*/
@@ -285,7 +285,7 @@ bool find_brackets(std::vector<data>& field,
     else         /*иначе ищем закрывающуюся скобку относительно открывающейся*/
     {
 
-        for (int i = pos_open_bracket; i < field.size(); i++) 
+        for (int i = pos_open_bracket; i < field.size(); i++)
             if (field[i].element_type == ET_BRACKET_RIGHT)
             {
                 pos_close_bracket = i;
@@ -300,7 +300,7 @@ bool find_brackets(std::vector<data>& field,
         pos_close_bracket = field.size() - 1;
         return false;/*если скобка не найдена*/
     }
-    /*неверное кол-во открытых и закрытых скобок*/
+        /*неверное кол-во открытых и закрытых скобок*/
     else if (((pos_open_bracket == -1) && (pos_close_bracket != -1)) || ((pos_open_bracket != -1) && (pos_close_bracket == -1)))
     {
         std::cout << "Something wrong with brackets\n";
@@ -451,49 +451,81 @@ void replace_x(std::vector<data>& field, double x) /*замена перемен
 
 void check_mistake(std::vector<data>& field) /*если перед скобками, после скобок или какой-то функцией не стоит знак умножить*/
 {
+
+    int counter_of_ET = 0;
+
+    for (int i = 0; i< field.size(); i++)
+        if ((field[i].element_type != ET_VALUE) && (field[i + 1].element_type != ET_VALUE))
+        {
+            if ((field[i].element_type == ET_BRACKET_LEFT && field[i + 1].element_type == ET_BRACKET_LEFT) ||
+                (field[i].element_type == ET_BRACKET_RIGHT && field[i + 1].element_type == ET_BRACKET_RIGHT) ||
+                    (field[i].element_type == ET_MINUS && field[i + 1].element_type == ET_BRACKET_LEFT) ||
+                    (field[i].element_type == ET_BRACKET_RIGHT && field[i + 1].element_type == ET_POW) ||
+                    (field[i].element_type == ET_POW && field[i + 1].element_type == ET_BRACKET_LEFT) ||
+                    (field[i].element_type == ET_MINUS && (field[i + 1].element_type == ET_SIN || field[i + 1].element_type == ET_COS
+                    || field[i + 1].element_type == ET_TAN || field[i + 1].element_type == ET_COTAN ||
+                            field[i + 1].element_type == ET_SQRT || field[i + 1].element_type == ET_EXP
+                            || field[i + 1].element_type == ET_POW)))
+                continue;
+            else
+                counter_of_ET++;
+
+            if (field[i].element_type == ET_VALUE || field[i].element_type == ET_X)
+                counter_of_ET = 0;
+        }
+
+    if (counter_of_ET > 2)
+    {
+        std::cout << "Incorrect input.";
+        exit(0);
+    }
+
     for (int i = 0; i < field.size() - 1; i++)      /*после числа на поставлен знак умножить*/
         if ((field[i].element_type == ET_VALUE) &&
             (field[i + 1].element_type == ET_BRACKET_LEFT ||
-                field[i + 1].element_type == ET_COS ||
-                field[i + 1].element_type == ET_SIN ||
-                field[i + 1].element_type == ET_TAN ||
-                field[i + 1].element_type == ET_COTAN ||
-                field[i + 1].element_type == ET_EXP ||
-                field[i + 1].element_type == ET_SQRT ||
-                field[i + 1].element_type == ET_X))
+             field[i + 1].element_type == ET_COS ||
+             field[i + 1].element_type == ET_SIN ||
+             field[i + 1].element_type == ET_TAN ||
+             field[i + 1].element_type == ET_COTAN ||
+             field[i + 1].element_type == ET_EXP ||
+             field[i + 1].element_type == ET_SQRT ||
+             field[i + 1].element_type == ET_X))
         {
             std::cout << "Don't forget to write '*' before function or brackets!";
             exit(0);
         }
-    
+
     for (int i = 0; i < field.size() - 1; i++)      /*после закрывающейся скобки не стоит знак умножить*/
         if (field[i].element_type == ET_BRACKET_RIGHT &&
-            (field[i + 1].element_type == ET_BRACKET_RIGHT ||
-                field[i + 1].element_type == ET_VALUE ||
-                field[i + 1].element_type == ET_SIN ||
-                field[i + 1].element_type == ET_COS ||
-                field[i + 1].element_type == ET_TAN ||
-                field[i + 1].element_type == ET_COTAN ||
-                field[i + 1].element_type == ET_EXP ||
-                field[i + 1].element_type == ET_SQRT ||
-                field[i + 1].element_type == ET_X))
+            (field[i + 1].element_type == ET_BRACKET_LEFT ||
+             field[i + 1].element_type == ET_VALUE ||
+             field[i + 1].element_type == ET_SIN ||
+             field[i + 1].element_type == ET_COS ||
+             field[i + 1].element_type == ET_TAN ||
+             field[i + 1].element_type == ET_COTAN ||
+             field[i + 1].element_type == ET_EXP ||
+             field[i + 1].element_type == ET_SQRT ||
+             field[i + 1].element_type == ET_X))
         {
             std::cout << "Don't forget to write '*' before function or brackets or after its!";
             exit(0);
         }
 
-    int counter_of_points = 0;
     for (int i = 0; i < field.size(); i++)
         if (field[i].element_type == ET_VALUE)
+        {
+            int counter_of_points = 0;
             for (int j = 0; j < field[i].str_value.size(); j++)
                 if (field[i].str_value[j] == '.')
                     counter_of_points++;
 
-    if (counter_of_points > 1)
-    {
-        std::cout << "There aren't one point in the value.";
-        exit(0);
-    }
+            if (counter_of_points > 1)
+            {
+                std::cout << "There aren't one point in the value.";
+                exit(0);
+            }
+        }
+
 }
 
 int main()
@@ -504,9 +536,9 @@ int main()
     {
         command = -1;
         std::cout << "Enter '0' to see instruction;\n"
-            << "Enter '1' to calculate an expression;\n"
-            << "Enter '2' to finish\n"
-            << "Enter the command you want to use: ";
+                  << "Enter '1' to calculate an expression;\n"
+                  << "Enter '2' to finish\n"
+                  << "Enter the command you want to use: ";
 
         std::cin >> command;
 
@@ -525,6 +557,8 @@ int main()
 
             input_to_vector_data(input, field);
 
+            unary(field);
+
             check_mistake(field);
 
             if (check_x(field) != 0)
@@ -535,9 +569,16 @@ int main()
                 replace_x(field, x);
             }
 
-            unary(field);
+            int current = field.size();
 
             calculate(field);
+
+            if (current == field.size())
+            {
+                std::cout << "Incorrect input.";
+                exit(0);
+            }
+
             std::cout << "=================================================\n";
             std::cout << final << " = " << field[0].value << std::endl;
             std::cout << "=================================================\n";
