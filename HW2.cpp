@@ -203,7 +203,7 @@ void unary(std::vector<data>& field) /*проверка на наличие ун
         field[1].value = -field[1].value;
         field.erase(field.begin());
     }
-    for (int i = 1; i < field.size(); i++)   /*рассматриваю все случае унарного минуса*/
+    for (int i = 1; i < field.size() - 1; i++)   /*рассматриваю все случае унарного минуса*/
     {
         if (field[i].element_type == ET_MINUS &&
             (field[i - 1].element_type == ET_PLUS ||
